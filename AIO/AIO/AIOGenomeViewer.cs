@@ -28,6 +28,7 @@ namespace AIO
             if (Genome == null) return;
 
             int mid = (int)Math.Round(e.ClipRectangle.Width / 2f);
+            int vmid = (int)Math.Round(e.ClipRectangle.Height / 2f);
 
             List<ViewerNeuron> neurons = new List<ViewerNeuron>();
 
@@ -49,6 +50,27 @@ namespace AIO
                 e.Graphics.FillRectangle(Brushes.White, curx, outputy, neuronsize, neuronsize);
                 neurons.Add(new ViewerNeuron() { ID = (int)Genome.Output[i].ID, X = curx, Y = outputy });
                 curx += neuronsize * 2;
+            }
+
+            if (Genome.HiddenLayers.Count > 0)
+            {
+                int midspace = (int)Math.Round((e.ClipRectangle.Height - 10f * 4f - neuronsize * 2f) / Genome.HiddenLayers.Count);
+                int midy = vmid - (int)Math.Round(midspace / 2f);
+                //e.Graphics.DrawLine(Pens.CornflowerBlue, mid, midy, mid, midy + midspace);
+                int cury = neuronsize + 10 * 2;
+                foreach (List<Neuron> layer in Genome.HiddenLayers)
+                {
+                    int midx = e.ClipRectangle.Left + (mid - (int)Math.Round((layer.Count * neuronsize + (layer.Count - 1f) * neuronsize) / 2f));
+                    curx = midx;
+                    int tempmidy = (int)Math.Round(cury + midspace / 2f - neuronmid);
+                    for (int i = 0; i < layer.Count; i++)
+                    {
+                        e.Graphics.FillRectangle(Brushes.White, curx, tempmidy, neuronsize, neuronsize);
+                        neurons.Add(new ViewerNeuron() { ID = (int)layer[i].ID, X = curx, Y = tempmidy });
+                        curx += neuronsize * 2;
+                    }
+                    cury += midspace;
+                }
             }
 
             foreach (NeuralConnection c in Genome.Connections)

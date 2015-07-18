@@ -71,7 +71,7 @@ namespace AIO
             for (int i = 0; i < this.HiddenLayers.Count; i++)
             {
                 List<Neuron> layer = new List<Neuron>(this.HiddenLayers[i].Capacity);
-                for (int j = 0; j < this.Output.Length; j++)
+                for (int j = 0; j < this.HiddenLayers[i].Count; j++)
                     layer.Add(new Neuron(this.HiddenLayers[i][j].ID, this.HiddenLayers[i][j].Threshold));
                 g.HiddenLayers.Add(layer);
             }

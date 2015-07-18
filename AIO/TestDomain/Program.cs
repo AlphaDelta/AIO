@@ -16,16 +16,21 @@ namespace TestDomain
             {
                 VolatileChampions = false,
                 PopulationDensity = 500,
-                TestsPerGeneration = 10,
+                TestsPerGeneration = 100,
                 //WeightFluctuationChance = 1f,
+                WeightFluctuationHigh = 0.5f,
+                WeightFluctuationLow = 0.0001f,
+                //AddNeuronChance = 0.9f,
+                //AddNeuronToNewLayerChance = 0.9f,
                 LiveChampionViewer = viewer
             });
 
             Thread t = new Thread((ThreadStart)delegate
             {
+                //while (Console.ReadKey().Key != ConsoleKey.Escape)
                 while (!Console.KeyAvailable)
                 {
-                    Console.WriteLine("Gen={0}, Fit={1}", net.Generation, net.GenerationFitness);
+                    Console.WriteLine("Gen={0}, {1:0.00}% correct", net.Generation, net.GenerationFitness);
                     net.TrainGeneration();
                 }
 
@@ -46,8 +51,8 @@ namespace TestDomain
         public override void GenerationInitialization() { rnd = new Random(); }
         public override void TestInitialization(int test)
         {
-            inpt1 = (test < 4 ? 1 : 0);
-            inpt2 = (test > 2 && test < 8 ? 1 : 0);
+            inpt1 = (test < 40 ? 1 : 0);
+            inpt2 = (test > 20 && test < 80 ? 1 : 0);
             //inpt1 = rnd.Next(2);
             //inpt2 = (inpt1 == 0 ? 1 : rnd.Next(2));
             outpt = inpt1 ^ inpt2;

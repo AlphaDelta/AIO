@@ -65,7 +65,7 @@ namespace AIO
                 param.Domain.GenomeInitialization(g);
 
                 //Remove neuron
-                if (g.HiddenLayers.Count > 0 && param.RemoveNeuronChance > rnd.NextDouble())
+                if (g.HiddenLayers.Count > 0 && param.RemoveNeuronChance > (float)rnd.NextDouble())
                 {
                     List<Neuron> layer = g.HiddenLayers[rnd.Next(g.HiddenLayers.Count)];
                     Neuron n = layer[rnd.Next(layer.Count)];
@@ -87,7 +87,7 @@ namespace AIO
                 }
 
                 //Remove connection
-                if (g.Connections.Count > 0 && param.RemoveConnectionChance > rnd.NextDouble())
+                if (g.Connections.Count > 0 && param.RemoveConnectionChance > (float)rnd.NextDouble())
                 {
                     NeuralConnection c = g.Connections[rnd.Next(g.Connections.Count)];
                     g.Connections.Remove(c);
@@ -96,29 +96,78 @@ namespace AIO
                 }
 
                 //Add neuron
-                if (param.AddNeuronChance > rnd.NextDouble())
+                float rand = (float)rnd.NextDouble();
+                if (param.AddNeuronChance > rand)
                 {
-                    bool newlayer = (g.HiddenLayers.Count < 1 || param.AddNeuronToNewLayerChance > rnd.NextDouble());
-                    List<Neuron> layer = (newlayer ? new List<Neuron>() : g.HiddenLayers[rnd.Next(g.HiddenLayers.Count)]);
+                    bool newlayer = (g.HiddenLayers.Count < 1 || param.AddNeuronToNewLayerChance > (float)rnd.NextDouble());
+                    int index = rnd.Next(g.HiddenLayers.Count);
+                    List<Neuron> layer = (newlayer ? new List<Neuron>() : g.HiddenLayers[index]);
 
-                    layer.Add(new Neuron(g.NeuronIndex, param.DefaultHiddenNeuronThreshold));
+                    Neuron newn = new Neuron(g.NeuronIndex, param.DefaultHiddenNeuronThreshold);
+                    layer.Add(newn);
                     g.NeuronIndex++;
 
-                    if (newlayer) g.HiddenLayers.Add(layer);
+                    NeuralConnection cin = new NeuralConnection();
+                    cin.In = newn;
+                    cin.Weight = param.DefaultConnectionWeight;
+                    NeuralConnection cout = new NeuralConnection();
+                    cout.Out = newn;
+                    cout.Weight = param.DefaultConnectionWeight;
+                    if (newlayer)
+                        g.HiddenLayers.Add(layer);
+
+                    if (newlayer || index == g.HiddenLayers.Count - 1 || rnd.Next(g.HiddenLayers.Count) == 0)
+                        cin.Out = g.Output[rnd.Next(g.Output.Length)];
+                    else
+                    {
+                        List<Neuron> layercin = g.HiddenLayers[rnd.Next(index + 1, g.HiddenLayers.Count)];
+                        cin.Out = layercin[rnd.Next(layercin.Count)];
+                    }
+
+                    if (index == 0 || rnd.Next(g.HiddenLayers.Count) == 0)
+                        cout.In = g.Input[rnd.Next(g.Input.Length)];
+                    else
+                    {
+                        List<Neuron> layercout = g.HiddenLayers[rnd.Next(0, index)];
+                        cout.In = layercout[rnd.Next(layercout.Count)];
+                    }
+
+                    if (param.FluctuateNewConnections)
+                    {
+                        float fluc = (float)(rnd.NextDouble() * (param.WeightFluctuationHigh - param.WeightFluctuationLow) + param.WeightFluctuationLow);
+                        float fluc2 = (float)(rnd.NextDouble() * (param.WeightFluctuationHigh - param.WeightFluctuationLow) + param.WeightFluctuationLow);
+                        if (rnd.Next(2) == 1)
+                            cin.Weight += fluc;
+                        else
+                            cin.Weight -= fluc;
+                        if (rnd.Next(2) == 1)
+                            cout.Weight += fluc2;
+                        else
+                            cout.Weight -= fluc2;
+                    }
+
+                    newn.Connections.Add(cin);
+                    newn.Connections.Add(cout);
+                    cin.Out.Connections.Add(cin);
+                    cout.In.Connections.Add(cout);
+
+                    g.Connections.Add(cin);
+                    g.Connections.Add(cout);
                 }
 
                 //Add connection
-                if (!champ || g.Connections.Count < 1 || param.AddConnectionChance > rnd.NextDouble())
+                if (!champ || g.Connections.Count < 1 || param.AddConnectionChance > (float)rnd.NextDouble())
                 {
                     for(int k = 0; k < 10; k++)
                     {
                         Neuron From, To;
                         bool last = false;
+                        int index = 0;
                         if (g.HiddenLayers.Count < 1 || rnd.Next(g.HiddenLayers.Count) == 0)
                             From = g.Input[rnd.Next(g.Input.Length)];
                         else
                         {
-                            int index = rnd.Next(g.HiddenLayers.Count);
+                            index = rnd.Next(g.HiddenLayers.Count);
                             last = (index == g.HiddenLayers.Count - 1);
                             List<Neuron> layer = g.HiddenLayers[index];
                             From = layer[rnd.Next(layer.Count)];
@@ -128,7 +177,7 @@ namespace AIO
                             To = g.Output[rnd.Next(g.Output.Length)];
                         else
                         {
-                            List<Neuron> layer = g.HiddenLayers[rnd.Next(g.HiddenLayers.Count)];
+                            List<Neuron> layer = g.HiddenLayers[rnd.Next(index + 1, g.HiddenLayers.Count)];
                             To = layer[rnd.Next(layer.Count)];
                         }
 
@@ -163,7 +212,7 @@ namespace AIO
                 }
 
                 //Fluctuate weight
-                if (param.WeightFluctuationChance > rnd.NextDouble())
+                if (param.WeightFluctuationChance > (float)rnd.NextDouble())
                 {
                     int index = rnd.Next(g.Connections.Count);
 
