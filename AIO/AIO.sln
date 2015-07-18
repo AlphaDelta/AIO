@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDomain", "TestDomain\TestDomain.csproj", "{DA82E50F-7369-47AF-94CE-9BAE92AB07D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIO", "AIO\AIO.csproj", "{BB4FCB7B-9565-4E0F-B9CB-5B4A232716FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA82E50F-7369-47AF-94CE-9BAE92AB07D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA82E50F-7369-47AF-94CE-9BAE92AB07D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA82E50F-7369-47AF-94CE-9BAE92AB07D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA82E50F-7369-47AF-94CE-9BAE92AB07D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB4FCB7B-9565-4E0F-B9CB-5B4A232716FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB4FCB7B-9565-4E0F-B9CB-5B4A232716FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB4FCB7B-9565-4E0F-B9CB-5B4A232716FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB4FCB7B-9565-4E0F-B9CB-5B4A232716FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
