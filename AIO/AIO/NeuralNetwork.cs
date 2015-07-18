@@ -64,6 +64,8 @@ namespace AIO
                 Genome g = gen[j];
                 param.Domain.GenomeInitialization(g);
 
+                int force = (param.ForceComplexify ? rnd.Next(3) : -1);
+
                 //Remove neuron
                 if (g.HiddenLayers.Count > 0 && param.RemoveNeuronChance > (float)rnd.NextDouble())
                 {
@@ -97,7 +99,7 @@ namespace AIO
 
                 //Add neuron
                 float rand = (float)rnd.NextDouble();
-                if (param.AddNeuronChance > rand)
+                if (force == 0 || param.AddNeuronChance > rand)
                 {
                     bool newlayer = (g.HiddenLayers.Count < 1 || param.AddNeuronToNewLayerChance > (float)rnd.NextDouble());
                     int index = rnd.Next(g.HiddenLayers.Count);
@@ -156,7 +158,7 @@ namespace AIO
                 }
 
                 //Add connection
-                if (!champ || g.Connections.Count < 1 || param.AddConnectionChance > (float)rnd.NextDouble())
+                if (!champ || g.Connections.Count < 1 || force == 1 || param.AddConnectionChance > (float)rnd.NextDouble())
                 {
                     for(int k = 0; k < 10; k++)
                     {
@@ -212,7 +214,7 @@ namespace AIO
                 }
 
                 //Fluctuate weight
-                if (param.WeightFluctuationChance > (float)rnd.NextDouble())
+                if (force == 2 || param.WeightFluctuationChance > (float)rnd.NextDouble())
                 {
                     int index = rnd.Next(g.Connections.Count);
 
@@ -228,11 +230,13 @@ namespace AIO
             param.Domain.GenerationInitialization();
             for (int i = 0; i < param.TestsPerGeneration; i++)
             {
-                param.Domain.TestInitialization(i);
+                param.Domain.TestInitialization(i, (int)_Generation, _GenerationFitness);
 
                 /* Testing */
                 foreach (Genome g in gen)
                 {
+                    if (g.Exhausted) continue;
+
                     float[] input = new float[param.InputNeurons];
                     param.Domain.Input(g, ref input);
                     for (int j = 0; j < param.InputNeurons; j++) g.Input[j].Value = input[j];

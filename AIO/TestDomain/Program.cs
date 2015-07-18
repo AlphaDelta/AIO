@@ -15,13 +15,14 @@ namespace TestDomain
             NeuralNetwork net = new NeuralNetwork(new NeuralNetworkParameters(2, 1, new XORDomain())
             {
                 VolatileChampions = false,
-                PopulationDensity = 500,
+                //ForceComplexify = true,
+                PopulationDensity = 1000,
                 TestsPerGeneration = 100,
                 //WeightFluctuationChance = 1f,
                 WeightFluctuationHigh = 0.5f,
                 WeightFluctuationLow = 0.0001f,
-                //AddNeuronChance = 0.9f,
-                //AddNeuronToNewLayerChance = 0.9f,
+                //AddNeuronChance = 1f,
+                //AddNeuronToNewLayerChance = 0.5f,
                 LiveChampionViewer = viewer
             });
 
@@ -34,9 +35,36 @@ namespace TestDomain
                     net.TrainGeneration();
                 }
 
+                Console.ReadKey();
+
+                while (true)
+                {
+                    Console.Write("Please insert two bits separated by spaces: ");
+                    string[] ln = Console.ReadLine().Split(' ');
+
+                    int num1, num2;
+                    if (ln.Length != 2 ||
+                        !int.TryParse(ln[0], out num1) ||
+                        !int.TryParse(ln[1], out num2) ||
+                        num1 > 1 ||
+                        num2 > 1)
+                        continue;
+
+                    int res = num1 ^ num2;
+
+                    float[] input = new float[2], output;
+                    input[0] = num1;
+                    input[1] = num2;
+                    net.Champion.Test(input, out output);
+
+                    Console.WriteLine("{0} ^ {1} = {2}", num1, num2, output[0]);
+                }
+
                 viewer.Invoke((Action)delegate { viewer.Close(); });
             });
             t.Start();
+
+            viewer.ControlBox = false;
 
             Application.Run(viewer);
         }
@@ -49,7 +77,7 @@ namespace TestDomain
         Random rnd;
         int inpt1, inpt2, outpt;
         public override void GenerationInitialization() { rnd = new Random(); }
-        public override void TestInitialization(int test)
+        public override void TestInitialization(int test, int generation, float fitness)
         {
             inpt1 = (test < 40 ? 1 : 0);
             inpt2 = (test > 20 && test < 80 ? 1 : 0);

@@ -17,6 +17,20 @@ namespace AIO
         public float Fitness = 0;
         public object[] Memory;
 
+        public bool Exhausted = false;
+
+        public void Test(float[] input, out float[] output, bool clear = true)
+        {
+            for (int j = 0; j < this.Input.Length; j++) this.Input[j].Value = input[j];
+
+            this.Process();
+
+            output = new float[this.Output.Length];
+            for (int j = 0; j < this.Output.Length; j++) output[j] = this.Output[j].Value;
+
+            if (clear) this.ClearNeurons();
+        }
+
         public void Process()
         {
             foreach (Neuron n in Input)
@@ -37,6 +51,7 @@ namespace AIO
         {
             Memory = null;
             Fitness = 0;
+            Exhausted = false;
 
             ClearNeurons();
         }
