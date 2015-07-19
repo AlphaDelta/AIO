@@ -7,9 +7,9 @@ namespace AIO
     public class NeuralNetworkParameters
     {
         public bool
-        VolatileChampions = true,
+        VolatileChampions = true, //Generation dependent champions, just like actual evolution
         FluctuateNewConnections = true,
-        ForceComplexify = false;
+        ForceComplexify = false; //At least 1 complexify mutation must happen with each mutation loop
 
         public uint
         InputNeurons = 0,

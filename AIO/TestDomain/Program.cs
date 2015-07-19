@@ -14,7 +14,7 @@ namespace TestDomain
             AIOGenomeViewer viewer = new AIOGenomeViewer();
             NeuralNetwork net = new NeuralNetwork(new NeuralNetworkParameters(2, 1, new XORDomain())
             {
-                VolatileChampions = false,
+                //VolatileChampions = false,
                 //ForceComplexify = true,
                 PopulationDensity = 300,
                 TestsPerGeneration = 100,

@@ -19,9 +19,11 @@ namespace AIO
         }
 
         const int neuronsize = 20, neuronmid = 10;
+        Pen low = new Pen(Brushes.Red, 2);
+        Pen high = new Pen(Brushes.Green, 2);
         protected override void OnPaint(PaintEventArgs e)
         {
-            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
 
             e.Graphics.FillRectangle(Brushes.MidnightBlue, e.ClipRectangle);
 
@@ -32,26 +34,25 @@ namespace AIO
 
             List<ViewerNeuron> neurons = new List<ViewerNeuron>();
 
-            int inputx = e.ClipRectangle.Left + (mid - (int)Math.Round((Genome.Input.Length * neuronsize + (Genome.Input.Length - 1f) * neuronsize) / 2f));
+            int inputx = e.ClipRectangle.Left + (mid - (int)Math.Round((Genome.Input.Length * neuronsize + (Genome.Input.Length - 1f) * neuronsize * 2) / 2f));
             int inputy = e.ClipRectangle.Bottom - neuronsize - 10;
             int curx = inputx;
             for (int i = 0; i < Genome.Input.Length; i++)
             {
-                e.Graphics.FillRectangle(Brushes.White, curx, inputy, neuronsize, neuronsize);
+                //e.Graphics.FillRectangle(Brushes.White, curx, inputy, neuronsize, neuronsize);
                 neurons.Add(new ViewerNeuron() { ID = (int)Genome.Input[i].ID, X = curx, Y = inputy });
-                curx += neuronsize * 2;
+                curx += neuronsize * 3;
             }
 
-            int outputx = e.ClipRectangle.Left + (mid - (int)Math.Round((Genome.Output.Length * neuronsize + (Genome.Output.Length - 1f) * neuronsize) / 2f));
+            int outputx = e.ClipRectangle.Left + (mid - (int)Math.Round((Genome.Output.Length * neuronsize + (Genome.Output.Length - 1f) * neuronsize * 2) / 2f));
             int outputy = 10;
             curx = outputx;
             for (int i = 0; i < Genome.Output.Length; i++)
             {
-                e.Graphics.FillRectangle(Brushes.White, curx, outputy, neuronsize, neuronsize);
+                //e.Graphics.FillRectangle(Brushes.White, curx, outputy, neuronsize, neuronsize);
                 neurons.Add(new ViewerNeuron() { ID = (int)Genome.Output[i].ID, X = curx, Y = outputy });
-                curx += neuronsize * 2;
+                curx += neuronsize * 3;
             }
-
             if (Genome.HiddenLayers.Count > 0)
             {
                 int midspace = (int)Math.Round((e.ClipRectangle.Height - 10f * 4f - neuronsize * 2f) / Genome.HiddenLayers.Count);
@@ -60,19 +61,20 @@ namespace AIO
                 int cury = neuronsize + 10 * 2 + midspace * (Genome.HiddenLayers.Count - 1);
                 foreach (List<Neuron> layer in Genome.HiddenLayers)
                 {
-                    int midx = e.ClipRectangle.Left + (mid - (int)Math.Round((layer.Count * neuronsize + (layer.Count - 1f) * neuronsize) / 2f));
+                    int midx = e.ClipRectangle.Left + (mid - (int)Math.Round((layer.Count * neuronsize + (layer.Count - 1f) * neuronsize * 2) / 2f));
                     curx = midx;
                     int tempmidy = (int)Math.Round(cury + midspace / 2f - neuronmid);
                     for (int i = 0; i < layer.Count; i++)
                     {
                         e.Graphics.FillRectangle(Brushes.White, curx, tempmidy, neuronsize, neuronsize);
                         neurons.Add(new ViewerNeuron() { ID = (int)layer[i].ID, X = curx, Y = tempmidy });
-                        curx += neuronsize * 2;
+                        curx += neuronsize * 3;
                     }
                     cury -= midspace;
                 }
             }
 
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             foreach (NeuralConnection c in Genome.Connections)
             {
                 ViewerNeuron to = null, from = null;
@@ -85,7 +87,13 @@ namespace AIO
 
                 if (to == null || from == null) continue;
 
-                e.Graphics.DrawLine((c.Weight == 1f ? Pens.Gray : (c.Weight < 1f ? Pens.Red : Pens.Green)), from.X + neuronmid, from.Y, to.X + neuronmid, to.Y + neuronsize);
+                e.Graphics.DrawLine((c.Weight == 1f ? Pens.Gray : (c.Weight < 1f ? low : high)), from.X + neuronmid, from.Y, to.X + neuronmid, to.Y + neuronsize);
+            }
+
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            foreach (ViewerNeuron vn in neurons)
+            {
+                e.Graphics.FillRectangle(Brushes.White, vn.X, vn.Y, neuronsize, neuronsize);
             }
         }
 
