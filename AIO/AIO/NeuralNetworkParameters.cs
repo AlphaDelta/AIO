@@ -15,6 +15,7 @@ namespace AIO
         InputNeurons = 0,
         OutputNeurons = 0,
         TestsPerGeneration = 10,
+        MutationsPerGeneration = 1,
         PopulationDensity = 100;
 
         public float

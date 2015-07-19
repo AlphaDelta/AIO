@@ -57,7 +57,7 @@ namespace AIO
                 int midspace = (int)Math.Round((e.ClipRectangle.Height - 10f * 4f - neuronsize * 2f) / Genome.HiddenLayers.Count);
                 int midy = vmid - (int)Math.Round(midspace / 2f);
                 //e.Graphics.DrawLine(Pens.CornflowerBlue, mid, midy, mid, midy + midspace);
-                int cury = neuronsize + 10 * 2;
+                int cury = neuronsize + 10 * 2 + midspace * (Genome.HiddenLayers.Count - 1);
                 foreach (List<Neuron> layer in Genome.HiddenLayers)
                 {
                     int midx = e.ClipRectangle.Left + (mid - (int)Math.Round((layer.Count * neuronsize + (layer.Count - 1f) * neuronsize) / 2f));
@@ -69,7 +69,7 @@ namespace AIO
                         neurons.Add(new ViewerNeuron() { ID = (int)layer[i].ID, X = curx, Y = tempmidy });
                         curx += neuronsize * 2;
                     }
-                    cury += midspace;
+                    cury -= midspace;
                 }
             }
 
