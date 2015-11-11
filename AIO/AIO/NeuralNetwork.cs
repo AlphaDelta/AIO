@@ -66,7 +66,7 @@ namespace AIO
                     Genome g = gen[j];
                     param.Domain.GenomeInitialization(g);
 
-                    int force = (param.ForceComplexify ? rnd.Next(3) : -1);
+                    int force = (param.ForceComplexify ? rnd.Next(4) : -1);
 
                     //Remove neuron
                     if (g.HiddenLayers.Count > 0 && param.RemoveNeuronChance > (float)rnd.NextDouble())
@@ -119,11 +119,12 @@ namespace AIO
 
                     //Add neuron
                     float rand = (float)rnd.NextDouble();
-                    if (force == 0 || param.AddNeuronChance > rand)
+                    bool fhlayer = false;
+                    if (force == 0 || param.AddNeuronChance > rand || (fhlayer = (g.HiddenLayers.Count < 1 && param.ForceHiddenLayer)))
                     {
                         bool newlayer = (g.HiddenLayers.Count < 1 || param.AddNeuronToNewLayerChance > (float)rnd.NextDouble());
                         int index = rnd.Next(g.HiddenLayers.Count);
-                        List<Neuron> layer = (newlayer ? new List<Neuron>() : g.HiddenLayers[index]);
+                        List<Neuron> layer = (newlayer || fhlayer ? new List<Neuron>() : g.HiddenLayers[index]);
 
                         Neuron newn = new Neuron(g.NeuronIndex, param.DefaultHiddenNeuronThreshold);
                         layer.Add(newn);
@@ -244,6 +245,21 @@ namespace AIO
                         else
                             g.Connections[index].Weight -= fluc;
                     }
+
+                    //Fluctuate threshold
+                    if (g.HiddenLayers.Count > 0 && (force == 3 || param.ThresholdFluctuationChance > (float)rnd.NextDouble()))
+                    {
+                        List<Neuron> hlayer = g.HiddenLayers[rnd.Next(g.HiddenLayers.Count)];
+                        int index = rnd.Next(hlayer.Count);
+
+                        float fluc = (float)(rnd.NextDouble() * (param.ThresholdFluctuationHigh - param.ThresholdFluctuationLow) + param.ThresholdFluctuationLow);
+                        if (hlayer[index].Threshold <= 0 || rnd.Next(2) == 1)
+                            hlayer[index].Threshold += fluc;
+                        else
+                            hlayer[index].Threshold -= fluc;
+
+                        if (hlayer[index].Threshold < 0) hlayer[index].Threshold = 0;
+                    }
                 }
                 #endregion
             }
@@ -298,6 +314,7 @@ namespace AIO
                 for (int j = 0; j < param.OutputNeurons; j++) output[j] = newchamp.Output[j].Value;
 
                 newchamp.Clear();
+                newchamp.CleanLayers();
                 _Champion = newchamp;
 
                 if (param.LiveChampionViewer != null)

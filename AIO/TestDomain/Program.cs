@@ -16,13 +16,14 @@ namespace TestDomain
             {
                 //VolatileChampions = false,
                 //ForceComplexify = true,
-                PopulationDensity = 300,
-                TestsPerGeneration = 100,
+                ForceHiddenLayer = true,
+                PopulationDensity = 1000,
+                TestsPerGeneration = 10,
                 //WeightFluctuationChance = 1f,
-                WeightFluctuationHigh = 0.1f,
-                WeightFluctuationLow = 0.0001f,
+                //WeightFluctuationHigh = 0.1f,
+                //WeightFluctuationLow = 0.0001f,
                 //AddNeuronChance = 0.1f,
-                //AddNeuronToNewLayerChance = 0.9f,
+                //AddNeuronToNewLayerChance = 0.5f,
                 MutationsPerGeneration = 5,
                 LiveChampionViewer = viewer
             });
@@ -32,7 +33,8 @@ namespace TestDomain
                 //while (Console.ReadKey().Key != ConsoleKey.Escape)
                 while (!Console.KeyAvailable)
                 {
-                    Console.WriteLine("Gen={0}, {1:0.00}% correct", net.Generation, net.GenerationFitness);
+                    Console.WriteLine("Gen={0}, {1:0.00}% correct", net.Generation, net.GenerationFitness * 10);
+                    if (net.GenerationFitness > 8) break;
                     net.TrainGeneration();
                 }
 
@@ -56,7 +58,7 @@ namespace TestDomain
                     input[1] = num2;
                     net.Champion.Test(input, out output);
 
-                    Console.WriteLine("{0} + {1} = {2}", num1, num2, output[0]);
+                    Console.WriteLine("{0} ^ {1} = {2}", num1, num2, output[0]);
                 }
 
                 viewer.Invoke((Action)delegate { viewer.Close(); });
@@ -78,8 +80,8 @@ namespace TestDomain
         public override void GenerationInitialization() { rnd = new Random(); }
         public override void TestInitialization(int test, int generation, float fitness)
         {
-            inpt1 = (test < 40 ? 1 : 0);
-            inpt2 = (test > 20 && test < 80 ? 1 : 0);
+            inpt1 = (test < 4 ? 0 : 1);
+            inpt2 = (test > 2 && test < 8 ? 0 : 1);
             outpt = inpt1 ^ inpt2;
         }
 
@@ -93,12 +95,14 @@ namespace TestDomain
 
         public override void Output(Genome g, float[] output)
         {
-            g.Fitness += 1f - Math.Abs(output[0] - (float)outpt);
+            float diff = Math.Abs(output[0] - (float)outpt);
+            if (diff > 1f) diff = 1f;
+            g.Fitness += 1f - diff;
         }
 
         public override void ChampionSelected(Genome g, float fitness, float[] output, uint generation)
         {
-            Console.WriteLine("Champion selected : Generation {0} : Fitness {1:0.0000} : {2} ^ {3} = {4}", generation, fitness, inpt1, inpt2, output[0]);
+            Console.WriteLine("Champion selected : Generation {0} : Fitness {1:0.0000} : {2} ^ {3} = {4:0.00}", generation, fitness, inpt1, inpt2, output[0]);
         }
     }
 

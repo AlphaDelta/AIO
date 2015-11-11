@@ -39,12 +39,15 @@ namespace AIO
 
             foreach (List<Neuron> layer in HiddenLayers)
                 foreach (Neuron n in Input)
+                {
+                    if (n.Value < n.Threshold) continue;
                     foreach (NeuralConnection c in n.Connections)
                     {
                         if (c.Out == n) continue;
 
                         c.Out.Value += n.Value * c.Weight;
                     }
+                }
         }
 
         public void Clear()
@@ -62,6 +65,47 @@ namespace AIO
             foreach (Neuron n in Output) n.Value = 0;
             foreach (List<Neuron> layer in HiddenLayers)
                 foreach (Neuron n in layer) n.Value = 0;
+        }
+
+        public void CleanLayers() //Cleans the hidden layers of any neurons with either no input or no output.
+        {
+            List<List<Neuron>> htoremove = new List<List<Neuron>>();
+            foreach (List<Neuron> hlayer in HiddenLayers)
+            {
+                List<Neuron> toremove = new List<Neuron>();
+                foreach (Neuron n in hlayer)
+                {
+                    bool inpt = false, outp = false;
+                    foreach (NeuralConnection c in n.Connections)
+                    {
+                        if (!inpt && c.Out == n) inpt = true;
+                        if (!outp && c.In == n) outp = true;
+
+                        if (inpt && outp) break;
+                    }
+
+                    if (inpt && outp) continue;
+
+                    toremove.Add(n);
+
+                    foreach (NeuralConnection c in n.Connections)
+                    {
+                        Connections.Remove(c);
+
+                        if(c.In != n) c.In.Connections.Remove(c);
+                        if (c.Out != n) c.Out.Connections.Remove(c);
+                    }
+                }
+
+                foreach (Neuron n in toremove)
+                    hlayer.Remove(n);
+
+                if (hlayer.Count < 1)
+                    htoremove.Add(hlayer);
+            }
+
+            foreach (List<Neuron> hlayer in htoremove)
+                HiddenLayers.Remove(hlayer);
         }
 
         public Genome DeepClone()

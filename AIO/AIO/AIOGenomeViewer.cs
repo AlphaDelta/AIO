@@ -19,6 +19,7 @@ namespace AIO
         }
 
         const int neuronsize = 20, neuronmid = 10;
+        Font font = new Font(FontFamily.GenericMonospace, 8.75f, FontStyle.Regular);
         Pen low = new Pen(Brushes.Red, 2);
         Pen high = new Pen(Brushes.Green, 2);
         protected override void OnPaint(PaintEventArgs e)
@@ -67,7 +68,7 @@ namespace AIO
                     for (int i = 0; i < layer.Count; i++)
                     {
                         e.Graphics.FillRectangle(Brushes.White, curx, tempmidy, neuronsize, neuronsize);
-                        neurons.Add(new ViewerNeuron() { ID = (int)layer[i].ID, X = curx, Y = tempmidy });
+                        neurons.Add(new ViewerNeuron() { ID = (int)layer[i].ID, X = curx, Y = tempmidy, Threshold = layer[i].Threshold });
                         curx += neuronsize * 3;
                     }
                     cury -= midspace;
@@ -94,12 +95,14 @@ namespace AIO
             foreach (ViewerNeuron vn in neurons)
             {
                 e.Graphics.FillRectangle(Brushes.White, vn.X, vn.Y, neuronsize, neuronsize);
+                TextRenderer.DrawText(e.Graphics, vn.Threshold.ToString("0.00"), font, new Point(vn.X, vn.Y), Color.Gray);
             }
         }
 
         class ViewerNeuron
         {
             public int ID, X, Y;
+            public float Threshold;
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)

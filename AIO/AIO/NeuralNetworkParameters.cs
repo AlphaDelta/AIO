@@ -9,7 +9,8 @@ namespace AIO
         public bool
         VolatileChampions = true, //Generation dependent champions, just like actual evolution
         FluctuateNewConnections = true,
-        ForceComplexify = false; //At least 1 complexify mutation must happen with each mutation loop
+        ForceComplexify = false, //At least 1 complexify mutation must happen with each mutation loop
+        ForceHiddenLayer = false; //Force each genome to have at least one hidden layer
 
         public uint
         InputNeurons = 0,
@@ -25,6 +26,9 @@ namespace AIO
         WeightFluctuationHigh = 0.1f, //Fluctuation is +- n, high 0.1 and low 0.01 make the range from 0.1 to 0.01 and -0.01 to -0.1
         WeightFluctuationLow = 0.01f,
         WeightFluctuationChance = 0.1f, //Chances range from 1 (being 100%) to 0 (being 0%)
+        ThresholdFluctuationHigh = 0.5f,
+        ThresholdFluctuationLow = 0.05f,
+        ThresholdFluctuationChance = 0.1f,
         AddNeuronChance = 0.002f,
         AddNeuronToNewLayerChance = 0.1f, //This is after AddNeuronChance
         RemoveNeuronChance = 0.001f,
